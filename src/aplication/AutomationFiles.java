@@ -1,23 +1,51 @@
 package aplication;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
-import java.text.*;
-import java.time.*;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 public class AutomationFiles {
 
-	public static void scanFiles(File folder) throws IOException {
+public static void listFiles(File folder) throws IOException {
 		
-		File fileFrom = new File("C:\\Users\\Diego Lins\\Desktop\\valcan\\backupsFrom.log"); //modificar caminho após finalizar \\home\\valcann\\backupsFrom.log
+		System.out.println("   NOME  | " + "TAMANHO | " + "DATA DE CRIAÇÃO | " + "DATA DE MODIFICAÇÃO");
+		System.out.println("----------------------------------------------------------\n");
+		for (File file : folder.listFiles()) {
+			if (!file.isDirectory()) {
+				BasicFileAttributes attrs = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
+				FileTime time = attrs.creationTime();
+				String patternCreation = "yyyy/MM/dd";
+			    DateFormat formatCreation = new SimpleDateFormat(patternCreation);
+			    String formattedCreation = formatCreation.format( new Date( time.toMillis()));
+			    String patternModification = "yyyy/MM/dd";
+			    SimpleDateFormat formatModification = new SimpleDateFormat(patternModification);   
+			    String formattedModification = formatModification.format(new Date(file.lastModified()));
+			    System.out.println(file.getName() + ", " + file.length() + ", " + formattedCreation + ", " + formattedModification);
+			} else {
+				listFiles(file);
+			}
+		}
+	}
+	
+	public static void saveResults(File folder, String saveResult) throws IOException {
+		
+		File fileFrom = new File(saveResult);
 		FileWriter writeFile = new FileWriter(fileFrom);
 		writeFile.write("   NOME  | " + "TAMANHO | " + "DATA DE CRIAÇÃO | " + "DATA DE MODIFICAÇÃO\n");
 		writeFile.write("----------------------------------------------------------\n");
@@ -33,9 +61,8 @@ public class AutomationFiles {
 			    String formattedModification = formatModification.format(new Date(file.lastModified()));
 			    String info = (file.getName() + ", " + file.length() + ", " + formattedCreation + ", " + formattedModification + "\n");
 			    writeFile.write(info);
-			    System.out.println(file.getName() + ", " + file.length() + ", " + formattedCreation + ", " + formattedModification);
 			} else {
-				scanFiles(file);
+				saveResults(file, saveResult);
 			}
 		}
 		writeFile.close();
@@ -43,6 +70,7 @@ public class AutomationFiles {
 	
 	@SuppressWarnings("resource")
 	public static void copyFile(File source, File destination) throws IOException {
+		
 		if (destination.exists())
 		destination.delete();
 
@@ -62,11 +90,10 @@ public class AutomationFiles {
 		   }
 		}
 	
-	public static void validationRemove(File folder) throws IOException, ParseException {
+	public static void validationRemove(File folder, String copyDestination) throws IOException, ParseException {
 		
-		String destinationPath = ("C:\\Users\\Diego Lins\\Desktop\\valcan\\backupsTo\\");//modificar caminho após finalizar \\home\\valcann\\backupsTo\\
-		File destination = new File ("C:\\Users\\Diego Lins\\Desktop\\valcan\\backupsTo\\"); //modificar caminho após finalizar \\home\\valcann\\backupsTo\\
-		Path path = Paths.get(destinationPath);
+		File destination = new File (copyDestination);
+		Path path = Paths.get(copyDestination);
 		DateTimeFormatter formatCurrentDate = DateTimeFormatter.ofPattern("yyyy/MM/dd");
 		String formattedCurrent = formatCurrentDate.format(LocalDateTime.now());
 		LocalDate convertCurrentDate = LocalDate.parse(formattedCurrent, formatCurrentDate);
@@ -91,17 +118,22 @@ public class AutomationFiles {
 					copyFile(sourceFile, destinationFile); 
 			    }
 			}else {
-				validationRemove(file);
+				validationRemove(file, copyDestination);
 			}
 		}
 	  }
 	
 	public static void main(String[] args) throws IOException, ParseException {
 		
-		File folder = new File("C:\\Users\\Diego Lins\\Desktop\\valcan\\"); //modificar caminho após finalizar \\home\\valcann\\backupsFrom
-		System.out.println("   NOME  | " + "TAMANHO | " + "DATA DE CRIAÇÃO | " + "DATA DE MODIFICAÇÃO");
-		System.out.println("----------------------------------------------------------\n");
-		scanFiles(folder);
-		validationRemove(folder);
+		File folder = new File("C:\\Users\\Diego Lins\\Desktop\\valcan\\backupsFrom\\");
+		String copyDestination = ("C:\\Users\\Diego Lins\\Desktop\\valcan\\backupsTo\\");
+		String backupFrom = ("C:\\Users\\Diego Lins\\Desktop\\valcan\\backupsFrom.log");
+		String backupTo = ("C:\\Users\\Diego Lins\\Desktop\\valcan\\backupsTo.log");
+		
+		
+		listFiles(folder); // Listar todos arquivos
+		saveResults(folder, backupFrom); // Salvar o resultado no arquivo log em um diretório
+		validationRemove(folder, copyDestination); // Fazer validação dos arquivos, remove os que tem mais de 3 dias de criado e copia os que nao 
+		saveResults(folder, backupTo); // Salvar o resultado no arquivo log em um diretório 
 	}
 }
