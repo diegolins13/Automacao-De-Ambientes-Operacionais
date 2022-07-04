@@ -125,15 +125,15 @@ public static void listFiles(File folder) throws IOException {
 	
 	public static void main(String[] args) throws IOException, ParseException {
 		
-		File folder = new File("C:\\Users\\Diego Lins\\Desktop\\valcan\\backupsFrom\\");
-		String copyDestination = ("C:\\Users\\Diego Lins\\Desktop\\valcan\\backupsTo\\");
-		String backupFrom = ("C:\\Users\\Diego Lins\\Desktop\\valcan\\backupsFrom.log");
-		String backupTo = ("C:\\Users\\Diego Lins\\Desktop\\valcan\\backupsTo.log");
+		File folder = new File("\\home\\valcann\\backupsFrom\\");
+		String copyDestination = ("\\home\\valcann\\backupsTo\\");
+		String backupFrom = ("\\home\\valcann\\backupsFrom.log");
+		String backupTo = ("\\home\\valcann\\backupsTo.log");
 		
 		
-		listFiles(folder); // Listar todos arquivos
-		saveResults(folder, backupFrom); // Salvar o resultado no arquivo log em um diretório
-		validationRemove(folder, copyDestination); // Fazer validação dos arquivos, remove os que tem mais de 3 dias de criado e copia os que nao 
-		saveResults(folder, backupTo); // Salvar o resultado no arquivo log em um diretório 
+		listFiles(folder);
+		saveResults(folder, backupFrom);
+		validationRemove(folder, copyDestination);
+		saveResults(folder, backupTo);
 	}
 }
