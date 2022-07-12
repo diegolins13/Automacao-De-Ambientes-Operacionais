@@ -22,4 +22,4 @@ caminho /home/valcann/backupsFrom;
 homevalcann/backupsTo;
 
 - Salvar o resultado no arquivo backupsTo.log em /home/valcann/.
-Fique a vontade para pesquisar ou reutilizar códigos disponíveis na comunidade.
+
